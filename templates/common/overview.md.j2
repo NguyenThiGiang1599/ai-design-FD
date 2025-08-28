@@ -1,0 +1,17 @@
+
+# {{ project }} — {{ domain }} {{ module }} Design (v0.2.0)
+
+**Scope**: Generate a baseline Design Pack for the {{ module }} process of a Warehouse Management System (WMS).
+- Warehouses: {{ warehouses }}
+- Concurrent users (est.): {{ users }}
+- Integrations: {{ integrations | join(", ") if integrations else "None"}}
+
+**Goals**
+- Standardize flows and ensure end-to-end traceability
+- Provide web app for clerks and handheld Android app for operators
+
+**Assumptions & Gaps**
+(See `assumptions.md` for details.)
+
+## RAG snippets (top hits)
+{{ rag_snippets if rag_snippets else 'N/A' }}

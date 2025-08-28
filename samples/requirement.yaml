@@ -1,0 +1,20 @@
+project: FHM WMS Hackathon
+domain: WMS
+module: Inbound
+integrations:
+  - SAP S/4 (IDoc ASN, GR)
+  - Zebra Printer (GS1-128)
+users: 200
+warehouses: 5
+constraints:
+  latency_scan_ms: 300
+  offline_mobile: true
+tech:
+  backend: NestJS
+  db: Postgres
+  mq: RabbitMQ
+  web: Next.js
+  mobile: Android (Kotlin)
+non_functional:
+  uptime: "99.9%"
+  audit: true

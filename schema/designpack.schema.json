@@ -1,0 +1,13 @@
+{
+  "overview_md": "string",
+  "c4_context.mmd": "string",
+  "c4_container.mmd": "string",
+  "sequence_inbound.mmd": "string",
+  "erd_inbound.mmd": "string",
+  "deployment.mmd": "string",
+  "openapi_inbound.json": {},
+  "ui_wireframes.md": "string",
+  "nfr.md": "string",
+  "backlog_inbound.md": "string",
+  "assumptions": "string"
+}

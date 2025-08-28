@@ -1,0 +1,13 @@
+
+```mermaid
+graph TD
+  A[API Gateway/NestJS] --> B[{{ module }} Service]
+  A --> C[Inventory Service]
+  B -->|events| E[(RabbitMQ)]
+  C --> E
+  B --> F[(Postgres + pgvector)]
+  C --> F
+  A --> G[Web App Next.js]
+  A --> H[Android App]
+  I[Grafana/Prometheus] --> A
+```

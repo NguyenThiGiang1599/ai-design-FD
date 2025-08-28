@@ -1,0 +1,8 @@
+{
+  "openapi": [],
+  "erd_api": [
+    "ERD missing fields that appear in API: ['bin', 'lpn', 'qty', 'sku']",
+    "No overlap between API properties and ERD fields (check naming)."
+  ],
+  "nfr_deployment": []
+}

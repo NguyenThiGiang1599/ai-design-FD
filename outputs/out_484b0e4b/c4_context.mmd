@@ -1,0 +1,17 @@
+```mermaid
+C4Context
+    title WMS { module } - Context
+    Person(operator, "Operator", "Handheld")
+    Person(clerk, "Clerk", "Web app")
+    System_Boundary(wms, "WMS") {
+        System(wms_api, "WMS API", "REST/JSON")
+        System(wms_web, "Web App", "Next.js")
+        System(wms_mobile, "Android App", "Kotlin")
+    }
+    System_Ext(erp, "ERP", "SAP S/4 (IDoc ASN, GR), Zebra Printer (GS1-128)")
+    Rel(clerk, wms_web, "Uses")
+    Rel(operator, wms_mobile, "Uses")
+    Rel(wms_web, wms_api, "HTTP/JSON")
+    Rel(wms_mobile, wms_api, "HTTP/JSON")
+    Rel(wms_api, erp, "Business docs exchange")
+```

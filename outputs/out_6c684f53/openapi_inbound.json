@@ -1,0 +1,42 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "WMS Inbound API", "version": "0.2.0" },
+  "paths": {
+    "/document": {
+      "post": {
+        "summary": "Ingest business document",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object" } } } },
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/operation/scan": {
+      "post": {
+        "summary": "Scan LPN/SKU/Qty",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": {
+          "type": "object",
+          "properties": { "lpn": {"type": "string"}, "sku": {"type": "string"}, "qty": {"type": "integer"} },
+          "required": ["lpn","sku","qty"]
+        } } } },
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/operation/confirm": {
+      "post": {
+        "summary": "Confirm operation",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": {
+          "type": "object",
+          "properties": { "lpn": {"type": "string"}, "bin": {"type": "string"} },
+          "required": ["lpn","bin"]
+        } } } },
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/inventory/{lpn}": {
+      "get": {
+        "summary": "Get inventory by LPN",
+        "parameters": [{ "in": "path", "name": "lpn", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "OK" } }
+      }
+    }
+  }
+}

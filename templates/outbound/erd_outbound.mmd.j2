@@ -1,0 +1,37 @@
+
+```mermaid
+erDiagram
+  OUTBOUND_DOC ||--|{ OUTBOUND_DOC_LINE : contains
+  OUTBOUND_DOC {
+    uuid id PK
+    string doc_no
+    string partner
+    date eta
+    string status
+  }
+  OUTBOUND_DOC_LINE {
+    uuid id PK
+    uuid doc_id FK
+    string sku
+    int expected_qty
+    int processed_qty
+    string lpn
+  }
+  LOCATION ||--o{ TASK : target
+  TASK {
+    uuid id PK
+    uuid line_id FK
+    string lpn
+    string from_loc
+    string to_loc
+    string status
+  }
+  INVENTORY {
+    uuid id PK
+    string sku
+    string lpn
+    string bin
+    int qty
+    string owner
+  }
+```

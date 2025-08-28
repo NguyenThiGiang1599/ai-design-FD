@@ -1,0 +1,19 @@
+```mermaid
+sequenceDiagram
+    participant ERP
+    participant API as WMS API
+    participant SVC as Inbound Svc
+    participant INV as Inventory Svc
+    participant MQ as RabbitMQ
+    participant HT as Handheld
+
+    ERP->>API: POST /document
+    API->>SVC: process document
+    HT->>API: POST /operation/scan {lpn, sku, qty}
+    API->>SVC: validate & update
+    SVC->>INV: adjust stock
+    SVC-->>MQ: event.emitted
+    HT->>API: POST /operation/confirm {lpn, bin}
+    API->>INV: move stock
+    SVC-->>ERP: callback
+```

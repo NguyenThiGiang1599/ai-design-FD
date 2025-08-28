@@ -1,0 +1,7 @@
+
+# Non-Functional Requirements (excerpt)
+- **Latency (scan round-trip)**: target <= {{ constraints.get("latency_scan_ms", 300) }} ms
+- **Availability**: {{ non_functional.get("uptime", "99.9%") }}
+- **Auditability**: {{ "Enabled" if non_functional.get("audit", True) else "Disabled" }}
+- **Security**: JWT-based auth; role-based access (Clerk, Operator, Admin)
+- **Observability**: logs, metrics, traces; error budget for scanning workflow

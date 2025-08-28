@@ -1,0 +1,21 @@
+
+```mermaid
+C4Container
+    title WMS {{ module }} - Containers
+    Person(operator, "Operator")
+    Person(clerk, "Clerk")
+    System_Boundary(wms, "WMS") {
+        Container(api, "API Gateway", "NestJS", "Auth, routing, validation")
+        Container(svc, "{{ module }} Service", "NestJS", "Core flows")
+        Container(inv, "Inventory Service", "NestJS", "Stock ledger, queries")
+        ContainerDb(db, "Postgres + pgvector", "SQL", "Operational & semantic data")
+        Container(queue, "RabbitMQ", "AMQP", "Events")
+    }
+    Rel(clerk, api, "HTTP")
+    Rel(operator, api, "HTTP")
+    Rel(api, svc, "RPC/HTTP")
+    Rel(api, inv, "RPC/HTTP")
+    Rel(svc, db, "SQL")
+    Rel(inv, db, "SQL")
+    Rel(svc, queue, "Publish events")
+```
