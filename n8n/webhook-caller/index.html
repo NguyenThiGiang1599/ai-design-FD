@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>n8n Webhook Tester</title>
+<style>
+:root{--bg:#0f1220;--panel:#171a2b;--muted:#8a93a6;--text:#e6ebff;--accent:#7c9aff;--accent-2:#9ff0ff;--danger:#ff6b6b;--ok:#4ade80;--radius:16px;--gap:14px;--shadow:0 10px 30px rgba(0,0,0,.35)}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,rgba(124,154,255,.18),transparent 50%),radial-gradient(800px 500px at -10% 120%,rgba(159,240,255,.18),transparent 50%),var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+.container{max-width:980px;margin:40px auto;padding:0 20px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.title{font-size:clamp(20px,3vw,28px);font-weight:700;letter-spacing:.2px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+.grid{display:grid;gap:var(--gap)}@media(min-width:820px){.grid-cols-2{grid-template-columns:1fr 1fr}}
+label{font-weight:600;color:var(--muted);font-size:.9rem}
+input,textarea,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0f1220;color:var(--text);outline:none}
+textarea{min-height:120px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr auto;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.14);cursor:pointer;color:var(--text);background:linear-gradient(180deg,rgba(124,154,255,.15),rgba(124,154,255,.05));transition:.2s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(124,154,255,.2)}
+.btn.secondary{background:transparent}
+.btn.danger{background:linear-gradient(180deg,rgba(255,107,107,.2),rgba(255,107,107,.05));border-color:rgba(255,107,107,.5)}
+.switch{display:inline-flex;align-items:center;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);font-size:.85rem}
+.muted{color:var(--muted)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+pre{margin:0;white-space:pre-wrap;word-break:break-word;max-height:420px;overflow:auto;background:#0b0e1a;border-radius:12px;border:1px solid rgba(255,255,255,.08);padding:16px}
+.status{display:flex;align-items:center;gap:10px;font-weight:600}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--muted)}.ok{background:var(--ok)}.bad{background:var(--danger)}
+.loading{background:transparent;border:2px solid var(--muted);border-top-color:var(--accent);border-radius:50%;width:14px;height:14px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}footer{margin-top:24px;color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <div class="title">🔗 n8n Webhook Tester</div>
+  <div class="pill">Made for <strong class="mono">/webhook/generate-fd</strong></div>
+</header>
+<section class="card grid grid-cols-2" id="config">
+  <div class="grid">
+    <label for="baseUrl">Base URL của n8n (không có đuôi slash)</label>
+    <input id="baseUrl" placeholder="https://your-n8n-host" />
+  </div>
+  <div class="grid">
+    <label for="path">Path Webhook</label>
+    <input id="path" value="/webhook/generate-fd" />
+  </div>
+  <div class="row">
+    <div class="switch">
+      <input type="checkbox" id="finalResult" />
+      <label for="finalResult">Đánh dấu <strong>finalResult</strong> (bật = true)</label>
+    </div>
+    <button class="btn secondary" id="genIds">Tạo nhanh accountId/sessionId</button>
+  </div>
+</section>
+<section class="card grid grid-cols-2" style="margin-top:20px">
+  <div class="grid">
+    <label for="functionName">functionName</label>
+    <input id="functionName" placeholder="createUser" />
+  </div>
+  <div class="grid">
+    <label for="accountId">accountId</label>
+    <input id="accountId" placeholder="acc_123" />
+  </div>
+  <div class="grid">
+    <label for="sessionId">sessionId</label>
+    <input id="sessionId" placeholder="sess_456" />
+  </div>
+  <div class="grid" style="grid-column:1/-1">
+    <label for="text">text (message gửi vào workflow)</label>
+    <textarea id="text" placeholder="Ví dụ: Hãy bổ sung phần validate input cho hàm createUser"></textarea>
+  </div>
+  <div class="row" style="grid-column:1/-1">
+    <button class="btn" id="sendBtn">🚀 Gửi request</button>
+    <button class="btn secondary" id="copyCurl">📋 Copy cURL</button>
+    <button class="btn danger" id="resetBtn">↺ Xoá form</button>
+  </div>
+</section>
+<section class="card" style="margin-top:20px">
+  <div class="status"><span id="statusDot" class="dot"></span><span id="statusText">Chưa gửi</span></div>
+  <div style="margin-top:12px" class="muted">Response</div>
+  <pre id="out" class="mono">(chưa có phản hồi)</pre>
+</section>
+<footer>💡 Lưu ý CORS: Nếu n8n của bạn chưa bật CORS cho domain này, hãy cấu hình <em>"Security &gt; CORS"</em> trong n8n hoặc dùng cURL.</footer>
+</div>
+<script>
+const $ = (s)=>document.querySelector(s);
+const state = {
+  get payload(){
+    return {
+      finalResult: $('#finalResult').checked,
+      text: $('#text').value.trim(),
+      accountId: $('#accountId').value.trim(),
+      sessionId: $('#sessionId').value.trim(),
+      functionName: $('#functionName').value.trim(),
+    };
+  },
+  get endpoint(){
+    const base = $('#baseUrl').value.replace(/\/$/, '');
+    const path = $('#path').value.startsWith('/') ? $('#path').value : '/' + $('#path').value;
+    return base + path;
+  }
+};
+function save(){
+  const data = {
+    baseUrl: $('#baseUrl').value,
+    path: $('#path').value,
+    functionName: $('#functionName').value,
+    accountId: $('#accountId').value,
+    sessionId: $('#sessionId').value,
+    finalResult: $('#finalResult').checked,
+    text: $('#text').value
+  };
+  localStorage.setItem('webhookTester', JSON.stringify(data));
+}
+function load(){
+  const raw = localStorage.getItem('webhookTester');
+  if(!raw) return;
+  try{
+    const d = JSON.parse(raw);
+    $('#baseUrl').value = d.baseUrl||'';
+    $('#path').value = d.path||'/webhook/generate-fd';
+    $('#functionName').value = d.functionName||'';
+    $('#accountId').value = d.accountId||'';
+    $('#sessionId').value = d.sessionId||'';
+    $('#finalResult').checked = !!d.finalResult;
+    $('#text').value = d.text||'';
+  }catch{}
+}
+function setStatus(kind, text){
+  const dot = $('#statusDot');
+  dot.className = 'dot';
+  if(kind==='ok') dot.classList.add('ok');
+  else if(kind==='bad') dot.classList.add('bad');
+  else if(kind==='loading') dot.className = 'loading';
+  $('#statusText').textContent = text;
+}
+function validate(){
+  const errs = [];
+  if(!$('#baseUrl').value.trim()) errs.push('Base URL');
+  if(!$('#path').value.trim()) errs.push('Path');
+  const p = state.payload;
+  if(!p.text) errs.push('text');
+  if(!p.accountId) errs.push('accountId');
+  if(!p.sessionId) errs.push('sessionId');
+  if(!p.functionName) errs.push('functionName');
+  return errs;
+}
+function randomId(prefix){
+  return prefix + '_' + Math.random().toString(36).slice(2,8) + Date.now().toString(36).slice(-4);
+}
+async function send(){
+  const errs = validate();
+  if(errs.length){
+    setStatus('bad', 'Thiếu: ' + errs.join(', '));
+    return;
+  }
+  setStatus('loading', 'Đang gửi...');
+  $('#out').textContent = '...';
+  const payload = state.payload;
+  save();
+  try{
+    const res = await fetch(state.endpoint,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    const text = await res.text();
+    try{ $('#out').textContent = JSON.stringify(JSON.parse(text), null, 2); }
+    catch{ $('#out').textContent = text; }
+    setStatus(res.ok?'ok':'bad', res.ok?'Thành công':'Lỗi ' + res.status);
+  }catch(err){
+    setStatus('bad','Request lỗi (có thể do CORS hoặc network)');
+    $('#out').textContent = String(err);
+  }
+}
+function copyCurl(){
+  const errs = validate();
+  if(errs.length){ setStatus('bad','Thiếu: '+errs.join(', ')); return; }
+  const payload = JSON.stringify(state.payload).replace(/\"/g,'\\\"').replace(/"/g,'\\"');
+  const cmd = `curl -X POST ${state.endpoint} -H "Content-Type: application/json" -d "${payload}"`;
+  navigator.clipboard.writeText(cmd).then(()=>{
+    setStatus('ok','Đã copy cURL vào clipboard');
+  },()=>{
+    setStatus('bad','Không copy được cURL');
+  });
+}
+function resetForm(){
+  ['functionName','accountId','sessionId','text'].forEach(id=>$('#'+id).value='');
+  $('#finalResult').checked=false; save();
+  setStatus('', 'Đã xoá form');
+  $('#out').textContent='(chưa có phản hồi)';
+}
+$('#sendBtn').addEventListener('click', send);
+$('#copyCurl').addEventListener('click', copyCurl);
+$('#resetBtn').addEventListener('click', resetForm);
+$('#genIds').addEventListener('click',()=>{
+  if(!$('#accountId').value) $('#accountId').value = randomId('acc');
+  if(!$('#sessionId').value) $('#sessionId').value = randomId('sess');
+  save();
+});
+document.querySelectorAll('input,textarea').forEach(el=>el.addEventListener('change',save));
+load();
+</script>
+</body>
+</html>
