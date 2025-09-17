@@ -193,7 +193,7 @@ export function ChatProvider({ children, accountId }) {
     const newSessionId = webhookService.generateSessionId();
     const welcomeMessage = {
       role: "assistant",
-      text: `Hi ${accountId}! I am an AI assistant help you create Functional Design Documents. Please decribe overview and I will start design!.`,
+      text: `Hi ${accountId}! I am an AI assistant help you create Functional Design Documents. Please describe overview and I will start design!.`,
       created_at: new Date().toISOString()
     };
 
