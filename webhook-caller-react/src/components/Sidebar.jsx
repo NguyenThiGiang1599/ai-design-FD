@@ -3,14 +3,36 @@ import { useChat } from "../contexts/ChatContext";
 import "../styles/Sidebar.css";
 
 export default function Sidebar({ accountId, onChangeAccount }) {
-  const { sessionList, currentSession, createNewSession, switchSession } = useChat();
+  const { sessionList, sessions, currentSession, createNewSession, switchSession } = useChat();
   const [searchTerm, setSearchTerm] = useState("");
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverItem, setDragOverItem] = useState(null);
 
-  const filteredSessions = sessionList.filter(session =>
-    session.sessionId.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Function to normalize text (remove diacritics and convert to lowercase)
+  const normalizeText = (text) => {
+    if (!text) return "";
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, ""); // Remove diacritics
+  };
+
+  const filteredSessions = sessionList.filter(session => {
+    if (!searchTerm.trim()) return true;
+    
+    const normalizedSearchTerm = normalizeText(searchTerm);
+    
+    // Search in session title/function name
+    const titleMatch = normalizeText(session.title || session.function_name || "").includes(normalizedSearchTerm);
+    
+    // Search in conversation content
+    const sessionMessages = sessions[session.sessionId] || [];
+    const contentMatch = sessionMessages.some(message => 
+      normalizeText(message.text || "").includes(normalizedSearchTerm)
+    );
+    
+    return titleMatch || contentMatch;
+  });
 
   const handleDragStart = (e, session) => {
     setDraggedItem(session);
