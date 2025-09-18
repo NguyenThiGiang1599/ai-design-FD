@@ -329,10 +329,37 @@ export function ChatProvider({ children, accountId }) {
       console.log('N8N response:', response);
 
       // Handle response - replace loading message with actual response
-      if (response?.data) {
+      if (response) {
+        let responseText;
+        
+        // Check if response is array (n8n returns array format)
+        if (Array.isArray(response) && response.length > 0) {
+          const firstItem = response[0];
+          
+          // Case 1: finalResult=true -> response contains link_docs
+          if (firstItem.link_docs) {
+            const linkDocs = firstItem.link_docs.replace(/Link docs:\\n `|` /g, '').trim();
+            responseText = `📄 **Functional Design Document**\n\n🔗 [Xem tài liệu](${linkDocs})`;
+          }
+          // Case 2: finalResult=false -> response contains response_text
+          else if (firstItem.response_text) {
+            responseText = firstItem.response_text;
+          }
+          // Fallback: use entire object as string
+          else {
+            responseText = JSON.stringify(firstItem, null, 2);
+          }
+        } else if (response?.data) {
+          responseText = response.data;
+        } else if (typeof response === 'string') {
+          responseText = response;
+        } else {
+          responseText = JSON.stringify(response, null, 2);
+        }
+        
         const assistantMessage = {
           role: "assistant",
-          text: response.data,
+          text: responseText,
           created_at: new Date().toISOString(),
           isLoading: false
         };
@@ -367,7 +394,7 @@ export function ChatProvider({ children, accountId }) {
         // Handle unexpected response format
         const errorMessage = {
           role: "assistant",
-          text: "No resRetry!",
+          text: "Please reload page.",
           created_at: new Date().toISOString(),
           isLoading: false
         };
@@ -429,23 +456,32 @@ export function ChatProvider({ children, accountId }) {
       console.log('Approve response:', response);
       
       // Handle response with link_docs
-      if (response?.data) {
-        let responseText = response.data;
+      if (response) {
+        let responseText;
         
-        // Check if response contains link_docs array
-        if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].link_docs) {
-          const linkDocs = response.data[0].link_docs;
-          responseText = `📄 **Functional Design Document**\n\n🔗 [Xem tài liệu](${linkDocs})`;
-        } else if (typeof response.data === 'string') {
-          try {
-            const parsedData = JSON.parse(response.data);
-            if (Array.isArray(parsedData) && parsedData.length > 0 && parsedData[0].link_docs) {
-              const linkDocs = parsedData[0].link_docs;
-              responseText = `📄 **Functional Design Document**\n\n🔗 [Xem tài liệu](${linkDocs})`;
-            }
-          } catch (e) {
-            // Keep original response if parsing fails
+        // Check if response is array (n8n returns array format)
+        if (Array.isArray(response) && response.length > 0) {
+          const firstItem = response[0];
+          
+          // Case 1: finalResult=true -> response contains link_docs
+          if (firstItem.link_docs) {
+            const linkDocs = firstItem.link_docs.trim();
+            responseText = `${linkDocs}`;
           }
+          // Case 2: finalResult=false -> response contains response_text
+          else if (firstItem.response_text) {
+            responseText = firstItem.response_text;
+          }
+          // Fallback: use entire object as string
+          else {
+            responseText = JSON.stringify(firstItem, null, 2);
+          }
+        } else if (response?.data) {
+          responseText = response.data;
+        } else if (typeof response === 'string') {
+          responseText = response;
+        } else {
+          responseText = JSON.stringify(response, null, 2);
         }
         
         const assistantMessage = {
