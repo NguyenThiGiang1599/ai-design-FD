@@ -380,7 +380,7 @@ export function ChatProvider({ children, accountId }) {
       
       let errorText;
       if (error.name === 'AbortError') {
-        errorText = `⏱️ API is taking too long (>7 minutes). Please try again later or check your connection.`;
+        errorText = `⏱️ API is taking too long (>4 minutes). Please try again later or check your connection.`;
       } else if (error.message.includes('fetch')) {
         errorText = `🌐 Network connection error. Please check your connection and try again.`;
       } else if (error.message.includes('timeout')) {
@@ -471,7 +471,7 @@ export function ChatProvider({ children, accountId }) {
       
       let errorText;
        if (error.name === 'AbortError') {
-         errorText = `⏱️ API is taking too long (>7 minutes). Please try again later or check your connection.`;
+         errorText = `⏱️ API is taking too long (>4 minutes). Please try again later or check your connection.`;
        } else if (error.message.includes('fetch')) {
          errorText = `🌐 Network connection error. Please check your connection and try again.`;
        } else if (error.message.includes('timeout')) {

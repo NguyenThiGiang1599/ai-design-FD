@@ -33,9 +33,9 @@ class WebhookService {
         payload
       });
 
-      // Set up timeout for 7 minutes (420,000 milliseconds)
+      // Set up timeout for 4 minutes (240,000 milliseconds)
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 420000);
+      const timeoutId = setTimeout(() => controller.abort(), 240000);
 
       const response = await fetch(`${this.baseURL}${this.webhookPath}`, {
         method: 'POST',
