@@ -378,9 +378,20 @@ export function ChatProvider({ children, accountId }) {
     } catch (error) {
       console.error('Error sending message:', error);
       
+      let errorText;
+      if (error.name === 'AbortError') {
+        errorText = `⏱️ API is taking too long (>7 minutes). Please try again later or check your connection.`;
+      } else if (error.message.includes('fetch')) {
+        errorText = `🌐 Network connection error. Please check your connection and try again.`;
+      } else if (error.message.includes('timeout')) {
+        errorText = `⏱️ Request is being processed, please wait...`;
+      } else {
+        errorText = `❌ Error sending message: ${error.message}`;
+      }
+      
       const errorMessage = {
         role: "assistant",
-        text: `❌ Lỗi khi gửi tin nhắn: ${error.message}`,
+        text: errorText,
         created_at: new Date().toISOString(),
         isLoading: false
       };
@@ -456,9 +467,22 @@ export function ChatProvider({ children, accountId }) {
       
       dispatch({ type: "SET_STATUS", payload: "Result confirmed" });
     } catch (error) {
+      console.error('Error approving final result:', error);
+      
+      let errorText;
+       if (error.name === 'AbortError') {
+         errorText = `⏱️ API is taking too long (>7 minutes). Please try again later or check your connection.`;
+       } else if (error.message.includes('fetch')) {
+         errorText = `🌐 Network connection error. Please check your connection and try again.`;
+       } else if (error.message.includes('timeout')) {
+         errorText = `⏱️ Request is being processed, please wait...`;
+       } else {
+         errorText = `❌ Error confirming result: ${error.message}`;
+       }
+      
       const errorMessage = {
         role: "assistant",
-        text: `❌ Error when approving: ${error.message}`,
+        text: errorText,
         created_at: new Date().toISOString(),
         isLoading: false
       };

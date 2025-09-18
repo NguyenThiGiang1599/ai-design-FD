@@ -33,13 +33,21 @@ class WebhookService {
         payload
       });
 
+      // Set up timeout for 7 minutes (420,000 milliseconds)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 420000);
+
       const response = await fetch(`${this.baseURL}${this.webhookPath}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller.signal
       });
+
+      // Clear timeout if request completes successfully
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`N8N webhook error! status: ${response.status}`);
@@ -50,6 +58,10 @@ class WebhookService {
       
       return data;
     } catch (error) {
+      if (error.name === 'AbortError') {
+        console.error('Request timeout after 5 minutes:', error);
+        throw new Error('Request timeout - N8N is taking too long to respond. Please try again.');
+      }
       console.error('Error sending message to N8N:', error);
       throw error;
     }

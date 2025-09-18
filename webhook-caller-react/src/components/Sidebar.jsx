@@ -66,7 +66,7 @@ export default function Sidebar({ accountId, onChangeAccount }) {
       <div className="sidebar-header">
         <div className="sidebar-brand">
           <div className="brand-icon">💬</div>
-          <h2 className="brand-title">Chat AI</h2>
+          <h2 className="brand-title">F-IDGS Studio</h2>
         </div>
         
         <div className="account-info">

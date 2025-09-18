@@ -16,7 +16,7 @@ export default function LoginForm({ onSubmit }) {
         <div className="login-card">
           <div className="login-header">
             <div className="login-icon">💬</div>
-            <h1 className="login-title">Welcome to Chat AI</h1>
+            <h1 className="login-title">F-IDGS Studio AI</h1>
             <p className="login-subtitle">Connect with your personal assistant</p>
           </div>
           

@@ -21,7 +21,7 @@ export default function ChatArea() {
     <main className="chat-area">
       <div className="chat-container">
         <div className="chat-header">
-          <h1 className="chat-title">AI Functional Design Assistant</h1>
+          <h1 className="chat-title">AI Innovative Design Generation</h1>
           <div className="chat-status">
             <div className={`status-indicator ${status === 'Ready' ? 'ready' : 'working'}`} />
             <span>{status}</span>

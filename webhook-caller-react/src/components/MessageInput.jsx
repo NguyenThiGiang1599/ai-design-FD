@@ -45,6 +45,8 @@ export default function MessageInput() {
     setText(""); // Clear text after approve
   };
 
+
+
   const handleResizeStart = (e) => {
     e.preventDefault();
     isResizing.current = true;

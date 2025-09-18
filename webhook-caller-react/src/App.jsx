@@ -1,26 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, useParams, useNavigate } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
 import ChatLayout from "./components/ChatLayout";
 import { ChatProvider } from "./contexts/ChatContext";
 import "./styles/App.css";
 
-export default function App() {
-  const [accountId, setAccountId] = useState("");
-  const [accountIdEntered, setAccountIdEntered] = useState(false);
-
-  const handleAccountSubmit = (id) => {
-    setAccountId(id);
-    setAccountIdEntered(true);
-  };
+function ChatPage() {
+  const { accountId } = useParams();
+  const navigate = useNavigate();
 
   const handleChangeAccount = () => {
-    setAccountIdEntered(false);
-    setAccountId("");
+    navigate("/");
   };
-
-  if (!accountIdEntered) {
-    return <LoginForm onSubmit={handleAccountSubmit} />;
-  }
 
   return (
     <ChatProvider accountId={accountId}>
@@ -29,5 +20,26 @@ export default function App() {
         onChangeAccount={handleChangeAccount} 
       />
     </ChatProvider>
+  );
+}
+
+function LoginPage() {
+  const navigate = useNavigate();
+
+  const handleAccountSubmit = (id) => {
+    navigate(`/${id}`);
+  };
+
+  return <LoginForm onSubmit={handleAccountSubmit} />;
+}
+
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/:accountId" element={<ChatPage />} />
+      </Routes>
+    </Router>
   );
 }
